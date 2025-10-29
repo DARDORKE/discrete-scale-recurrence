@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Serveur web minimal pour visualiser la récurrence d'échelle discrète.
+Minimal web server to visualize the discrete scale recurrence.
 
-L'application pré-calcule la simulation, expose les données en JSON et
-fournit une page HTML/JS permettant de naviguer dans l'évolution.
+The app precomputes the simulation, serves JSON data and an HTML/JS page
+to navigate through the evolution.
 """
 
 from __future__ import annotations
@@ -25,10 +25,10 @@ from scale_recurrence import (
 )
 
 INDEX_HTML = """<!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Visualisation Récurrence d’échelle</title>
+  <title>Discrete Scale Recurrence — Viewer</title>
   <style>
     body { font-family: system-ui, sans-serif; margin: 0; background: #111; color: #eee; }
     header { padding: 1rem; background: #222; }
@@ -46,14 +46,14 @@ INDEX_HTML = """<!DOCTYPE html>
 </head>
 <body>
   <header>
-    <h1>Visualisation de la récurrence d’échelle discrète</h1>
+    <h1>Discrete Scale Recurrence — Visualization</h1>
     <div id="meta"></div>
   </header>
   <main>
     <section id="controls">
       <button id="playBtn">Pause</button>
-      <label>Vitesse: <input id="speedRange" type="range" min="5" max="120" value="30" /></label>
-      <label>Itération: <input id="stepRange" type="range" min="0" max="0" value="0" /></label>
+      <label>Speed: <input id="speedRange" type="range" min="5" max="120" value="30" /></label>
+      <label>Iteration: <input id="stepRange" type="range" min="0" max="0" value="0" /></label>
       <span id="stepLabel">step 0</span>
     </section>
     <canvas id="stateCanvas"></canvas>
@@ -159,7 +159,7 @@ function drawFidelity(canvas, fidelities, currentStep) {
 async function main() {
   const response = await fetch('/data', { cache: 'no-store' });
   if (!response.ok) {
-    document.body.innerHTML = '<p>Impossible de charger les données.</p>';
+    document.body.innerHTML = '<p>Failed to load data.</p>';
     return;
   }
   const data = await response.json();
@@ -191,10 +191,10 @@ async function main() {
     stateCanvas.dataset.dim = '2';
     drawState = createHeatmapDrawer(stateCanvas, w, h);
   } else {
-    throw new Error('Dimension non prise en charge');
+    throw new Error('Unsupported dimensionality');
   }
 
-  metaDiv.textContent = `Grille: ${data.grid_shape.join('×')} | α = ${data.alpha.toFixed(6)} | étapes: ${stepsCount - 1}`;
+  metaDiv.textContent = `Grid: ${data.grid_shape.join('×')} | α = ${data.alpha.toFixed(6)} | steps: ${stepsCount - 1}`;
 
   let playing = true;
   let currentStep = 0;
@@ -210,10 +210,10 @@ async function main() {
     const slope = data.structure_slopes ? data.structure_slopes[step] : null;
     const alphaEff = data.alphas ? data.alphas[Math.max(0, step - 1)] : null;
     const lines = [
-      `Fidélité: ${data.fidelities[step].toFixed(6)}`,
+      `Fidelity: ${data.fidelities[step].toFixed(6)}`,
     ];
     if (entropy !== null && !Number.isNaN(entropy)) {
-      lines.push(`Entropie spectrale: ${entropy.toFixed(4)}`);
+      lines.push(`Spectral entropy: ${entropy.toFixed(4)}`);
     }
     if (slope !== null && !Number.isNaN(slope)) {
       lines.push(`Structure slope: ${slope.toFixed(4)}`);
@@ -237,7 +237,7 @@ async function main() {
 
   playBtn.addEventListener('click', () => {
     playing = !playing;
-    playBtn.textContent = playing ? 'Pause' : 'Lecture';
+    playBtn.textContent = playing ? 'Pause' : 'Play';
     if (playing) {
       scheduleNextFrame();
     } else if (timerId !== null) {
@@ -267,7 +267,7 @@ async function main() {
 window.addEventListener('DOMContentLoaded', () => {
   main().catch((err) => {
     console.error(err);
-    document.body.innerHTML = '<p>Erreur lors de la récupération des données.</p>';
+    document.body.innerHTML = '<p>Error while fetching data.</p>';
   });
 });
 """
@@ -471,34 +471,34 @@ class VisualizationHandler(BaseHTTPRequestHandler):
 
 def main(argv: Optional[Sequence[str]] = None) -> None:
     parser = argparse.ArgumentParser(
-        description="Serveur web de visualisation de la récurrence d'échelle.",
+        description="Web server to visualize the discrete scale recurrence.",
     )
-    parser.add_argument("--grid", default="256", help="grille, ex. 256 ou 128x128")
-    parser.add_argument("--steps", type=int, default=256, help="nombre d'itérations calculées")
-    parser.add_argument("--alpha", type=float, help="alpha en radians")
+    parser.add_argument("--grid", default="256", help="grid, e.g. 256 or 128x128")
+    parser.add_argument("--steps", type=int, default=256, help="number of computed iterations")
+    parser.add_argument("--alpha", type=float, help="alpha in radians")
     parser.add_argument("--alpha-ratio", type=str, help="fraction p/q ⇒ alpha = 2π * (p/q)")
     parser.add_argument("--initial", choices=["gaussian", "comb", "random"], default="gaussian")
-    parser.add_argument("--width", type=float, default=0.08, help="largeur gaussienne")
-    parser.add_argument("--center", type=str, help="centre initial")
-    parser.add_argument("--momentum", type=str, help="impulsion initiale")
-    parser.add_argument("--period", type=str, help="période pour l'état peigne")
-    parser.add_argument("--random-seed", type=int, help="graine pour états aléatoires/bruit")
+    parser.add_argument("--width", type=float, default=0.08, help="gaussian width")
+    parser.add_argument("--center", type=str, help="initial center")
+    parser.add_argument("--momentum", type=str, help="initial momentum")
+    parser.add_argument("--period", type=str, help="period for comb initial state")
+    parser.add_argument("--random-seed", type=int, help="seed for random states/noise")
     parser.add_argument("--noise-alpha-std", type=float, default=0.0)
     parser.add_argument("--noise-phase-std", type=float, default=0.0)
     parser.add_argument("--noise-phase-space", choices=["spatial", "fourier"], default="spatial")
-    parser.add_argument("--compute-entropy", action="store_true", help="inclure l'entropie spectrale")
-    parser.add_argument("--compute-structure", action="store_true", help="inclure la pente du structure function")
-    parser.add_argument("--structure-scales", type=str, help="échelles pour le structure function")
+    parser.add_argument("--compute-entropy", action="store_true", help="include spectral entropy")
+    parser.add_argument("--compute-structure", action="store_true", help="include structure-function slope")
+    parser.add_argument("--structure-scales", type=str, help="scales for the structure function")
     parser.add_argument("--dtype", choices=["complex64", "complex128"], default="complex128")
-    parser.add_argument("--port", type=int, default=8000, help="port HTTP")
-    parser.add_argument("--host", default="127.0.0.1", help="hôte d'écoute (défaut: 127.0.0.1)")
-    parser.add_argument("--open-browser", action="store_true", help="ouvrir automatiquement le navigateur")
-    parser.add_argument("--verbose", action="store_true", help="logs HTTP verboses")
+    parser.add_argument("--port", type=int, default=8000, help="HTTP port")
+    parser.add_argument("--host", default="127.0.0.1", help="listening host (default: 127.0.0.1)")
+    parser.add_argument("--open-browser", action="store_true", help="automatically open the browser")
+    parser.add_argument("--verbose", action="store_true", help="verbose HTTP logs")
     args = parser.parse_args(argv)
 
     grid_shape = parse_grid(args.grid)
     if len(grid_shape) not in (1, 2):
-        raise SystemExit("Cette visualisation web prend uniquement en charge les grilles 1D ou 2D.")
+        raise SystemExit("This web visualization only supports 1D or 2D grids.")
 
     alpha = resolve_alpha(args.alpha, args.alpha_ratio)
 
@@ -510,7 +510,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
     server = HTTPServer((args.host, args.port), VisualizationHandler)
     url = f"http://{args.host}:{args.port}/"
-    print(f"Simulation prête. Serveur accessible sur {url}")
+    print(f"Simulation ready. Server available at {url}")
 
     if args.open_browser:
         try:
@@ -518,12 +518,12 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
 
             threading.Thread(target=webbrowser.open, args=(url,), daemon=True).start()
         except Exception as exc:  # noqa: BLE001
-            print(f"Impossible d'ouvrir le navigateur automatiquement: {exc}")
+            print(f"Could not open the browser automatically: {exc}")
 
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\nArrêt du serveur.")
+        print("\nStopping server.")
     finally:
         server.server_close()
 

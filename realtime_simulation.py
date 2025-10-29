@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Animation temps réel de la récurrence d'échelle discrète.
+Real-time animation of the discrete scale recurrence.
 
-Ce script s'appuie sur :class:`DiscreteScaleRecurrenceSimulator` pour générer les
-états étape par étape et met à jour une figure Matplotlib (profil 1D ou 2D).
+This script uses :class:`DiscreteScaleRecurrenceSimulator` to generate step-by-step
+states and updates a Matplotlib figure (1D or 2D profile).
 """
 
 from __future__ import annotations
@@ -102,7 +102,7 @@ def build_initial_state(args: argparse.Namespace, grid_shape: Tuple[int, ...]) -
 
 
 class Visualizer:
-    """Gestion des tracés pour l'animation temps réel."""
+    """Plot management for real-time animation."""
 
     def __init__(
         self,
@@ -148,14 +148,14 @@ class Visualizer:
             self.state_im = self.ax_state.imshow(data, origin="lower", cmap="viridis")
             self.fig.colorbar(self.state_im, ax=self.ax_state, fraction=0.046, pad=0.04)
         self.ax_state.set_ylabel("|psi|^2")
-        self.ax_state.set_title("Évolution spatiale")
+        self.ax_state.set_title("Spatial evolution")
         self.ax_state.grid(self.dim == 1, alpha=0.2)
 
         self.fid_line, = self.ax_fid.plot([], [], color="tab:blue")
         self.ax_fid.set_xlim(0, 1)
         self.ax_fid.set_ylim(0, 1.05)
-        self.ax_fid.set_xlabel("Itération")
-        self.ax_fid.set_ylabel("Fidélité")
+        self.ax_fid.set_xlabel("Iteration")
+        self.ax_fid.set_ylabel("Fidelity")
         self.ax_fid.grid(True, alpha=0.2)
 
         self.info_text = self.ax_fid.text(
@@ -227,11 +227,11 @@ class Visualizer:
 
 def main(argv: Optional[Sequence[str]] = None) -> None:
     parser = argparse.ArgumentParser(
-        description="Animation temps réel de la dynamique U_alpha.",
+        description="Real-time animation of the U_alpha dynamics.",
     )
-    parser.add_argument("--grid", default="256", help="grille, ex. 256 ou 128x128")
-    parser.add_argument("--steps", type=int, default=256, help="nombre d'itérations")
-    parser.add_argument("--alpha", type=float, help="alpha en radians")
+    parser.add_argument("--grid", default="256", help="grid, e.g. 256 or 128x128")
+    parser.add_argument("--steps", type=int, default=256, help="number of iterations")
+    parser.add_argument("--alpha", type=float, help="alpha in radians")
     parser.add_argument(
         "--alpha-ratio",
         type=str,
@@ -241,15 +241,15 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         "--initial",
         choices=["gaussian", "comb", "random"],
         default="gaussian",
-        help="profil initial",
+        help="initial profile",
     )
-    parser.add_argument("--width", type=float, default=0.08, help="largeur de la gaussienne")
-    parser.add_argument("--center", type=str, help="centre (coords séparées par des virgules)")
-    parser.add_argument("--momentum", type=str, help="tilt en impulsion")
-    parser.add_argument("--period", type=str, help="période pour l'état peigne")
-    parser.add_argument("--random-seed", type=int, help="graine pour phases aléatoires")
-    parser.add_argument("--fps", type=float, default=30.0, help="images par seconde (animation)")
-    parser.add_argument("--structure-scales", type=str, help="échelles pour le structure function")
+    parser.add_argument("--width", type=float, default=0.08, help="gaussian width")
+    parser.add_argument("--center", type=str, help="center (comma-separated)")
+    parser.add_argument("--momentum", type=str, help="momentum tilt")
+    parser.add_argument("--period", type=str, help="period for comb initial state")
+    parser.add_argument("--random-seed", type=int, help="seed for random phases")
+    parser.add_argument("--fps", type=float, default=30.0, help="frames per second (animation)")
+    parser.add_argument("--structure-scales", type=str, help="scales for the structure function")
     parser.add_argument("--noise-alpha-std", type=float, default=0.0)
     parser.add_argument("--noise-phase-std", type=float, default=0.0)
     parser.add_argument(
@@ -260,39 +260,39 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     parser.add_argument(
         "--compute-entropy",
         action="store_true",
-        help="suivre l'entropie spectrale au fil du temps",
+        help="track spectral entropy over time",
     )
     parser.add_argument(
         "--compute-structure",
         action="store_true",
-        help="suivre l'exposant du structure function (q = 2)",
+        help="track the structure function exponent (q = 2)",
     )
     parser.add_argument(
         "--dtype",
         choices=["complex64", "complex128"],
         default="complex128",
-        help="précision numérique",
+        help="numeric precision",
     )
     parser.add_argument(
         "--no-show",
         action="store_true",
-        help="mode headless (aucune fenêtre) — requiert --save-frames",
+        help="headless mode (no window) — requires --save-frames",
     )
     parser.add_argument(
         "--save-frames",
         type=Path,
-        help="répertoire de sortie pour écrire une séquence PNG (utiliser avec --no-show)",
+        help="output directory to write a PNG sequence (use with --no-show)",
     )
     args = parser.parse_args(argv)
 
     if args.no_show and args.save_frames is None:
-        parser.error("--no-show nécessite --save-frames pour conserver la simulation.")
+        parser.error("--no-show requires --save-frames to preserve the simulation.")
     if not args.no_show and args.save_frames is not None:
-        parser.error("--save-frames s'utilise actuellement avec --no-show.")
+        parser.error("--save-frames currently requires --no-show.")
 
     grid_shape = parse_grid(args.grid)
     if len(grid_shape) not in (1, 2):
-        raise SystemExit("Seules les grilles 1D ou 2D sont prises en charge pour l'animation.")
+        raise SystemExit("Only 1D or 2D grids are supported for the animation.")
 
     alpha = resolve_alpha(args.alpha, args.alpha_ratio)
     dtype = np.complex64 if args.dtype == "complex64" else np.complex128

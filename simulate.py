@@ -165,8 +165,8 @@ def plot_results(result, grid_shape: Tuple[int, ...], plot_file: Optional[Path] 
         import matplotlib.pyplot as plt
     except ImportError as exc:
         raise SystemExit(
-            "Matplotlib est requis pour --plot ou --plot-file. "
-            "Installez-le via `python3 -m pip install matplotlib`."
+            "Matplotlib is required for --plot or --plot-file. "
+            "Install it via `python3 -m pip install matplotlib`."
         ) from exc
 
     steps = np.arange(result.fidelities.size)
@@ -184,11 +184,11 @@ def plot_results(result, grid_shape: Tuple[int, ...], plot_file: Optional[Path] 
 
     ax_idx = 0
     ax = axes[ax_idx]
-    ax.plot(steps, result.fidelities, color="tab:blue", label="Fidélité")
+    ax.plot(steps, result.fidelities, color="tab:blue", label="Fidelity")
     for step, _ in result.revivals:
         ax.axvline(step, color="tab:orange", linestyle="--", alpha=0.3)
-    ax.set_ylabel("Fidélité")
-    ax.set_title("Evolution de la fidélité")
+    ax.set_ylabel("Fidelity")
+    ax.set_title("Fidelity over iterations")
     ax.grid(True, alpha=0.2)
     ax.legend()
 
@@ -196,16 +196,16 @@ def plot_results(result, grid_shape: Tuple[int, ...], plot_file: Optional[Path] 
         ax_idx += 1
         ax = axes[ax_idx]
         ax.plot(steps, result.spectral_entropy, color="tab:green")
-        ax.set_ylabel("Entropie")
-        ax.set_title("Entropie spectrale normalisée")
+        ax.set_ylabel("Entropy")
+        ax.set_title("Normalized spectral entropy")
         ax.grid(True, alpha=0.2)
 
     if result.structure_slopes is not None:
         ax_idx += 1
         ax = axes[ax_idx]
         ax.plot(steps, result.structure_slopes, color="tab:red")
-        ax.set_ylabel("Pente")
-        ax.set_title("Exposant du structure function (q=2)")
+        ax.set_ylabel("Slope")
+        ax.set_title("Structure function exponent (q=2)")
         ax.grid(True, alpha=0.2)
 
     if result.stored_states is not None:
@@ -220,15 +220,15 @@ def plot_results(result, grid_shape: Tuple[int, ...], plot_file: Optional[Path] 
             im = ax.imshow(data, origin="lower", cmap="viridis")
             ax.set_ylabel(label)
             fig.colorbar(im, ax=ax, shrink=0.8)
-        ax.set_title("Profil final")
+        ax.set_title("Final profile")
         ax.grid(False)
 
-    axes[-1].set_xlabel("Itération")
+    axes[-1].set_xlabel("Iteration")
     fig.tight_layout()
 
     if plot_file is not None:
         fig.savefig(plot_file, dpi=160)
-        print(f"Figure enregistrée dans {plot_file}")
+        print(f"Saved figure to {plot_file}")
         plt.close(fig)
     else:
         plt.show()
@@ -279,12 +279,12 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     parser.add_argument(
         "--plot",
         action="store_true",
-        help="afficher les courbes (Matplotlib requis)",
+        help="display plots (requires Matplotlib)",
     )
     parser.add_argument(
         "--plot-file",
         type=Path,
-        help="enregistrer la figure au format PNG (Matplotlib requis)",
+        help="save the figure as PNG (requires Matplotlib)",
     )
     parser.add_argument(
         "--dtype",

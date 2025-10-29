@@ -113,10 +113,10 @@ class DiscreteScaleRecurrenceSimulator:
         return_state: bool = False,
     ) -> Iterator[StepState]:
         """
-        Yield a :class:`StepState` for each iteration, starting at step 0 (état initial).
+        Yield a :class:`StepState` for each iteration, starting at step 0 (initial state).
 
-        If ``return_state`` est vrai, chaque instantané contient une copie de l'état
-        courant (complexe). Sinon, ``state`` est laissé à ``None``.
+        If ``return_state`` is True, each snapshot contains a copy of the current
+        complex state. Otherwise, ``state`` is left as ``None``.
         """
         metrics_set = set(metrics)
         compute_entropy = "spectral_entropy" in metrics_set
