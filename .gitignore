@@ -1,0 +1,79 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python build/caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+site/
+
+# Virtual environments
+.venv/
+venv/
+env/
+.conda/
+
+# Testing & tooling caches
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Local outputs (simulation artifacts)
+outputs/
+frames/
+frames_*/
+outputs/**/*.npz
+outputs/**/*.png
+outputs/**/*.csv
+outputs/**/*.json
+outputs/**/*.gif
+outputs/**/*.mp4
+outputs/**/*.webm
+outputs/**/*.zip
+outputs/**/*.tar
+
+# Logs
+*.log
+
+# Local environment/config
+.env
+.env.*
+.python-version
+.tool-versions
+.ruff_cache/
+.pylint.d/
+.cache/
+
+# Node/JS (if added for web experiments)
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Ad-hoc figures at repo root (examples)
+figure_*.png
+revivals*.png
+irrational*.png
+
+# Project docs not required to run code (ignore if you only want code tracked)
+CODE_AND_RESULTS_GUIDE.md
+TEST_DOCUMENTATION.md
+REPORT.md
+REDDIT_POST.md
+REDDIT_POST_FR.md
+POST_RAISONNEMENT_FR.md
+/intuition.md
